@@ -24,6 +24,8 @@ Resources:
       MemorySize: 128
       Timeout: 300
       Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LocationLogTable
         - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
