@@ -24,9 +24,12 @@ Resources:
       MemorySize: 128
       Timeout: 300
       Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt TrackerIn.QueueName
         - DynamoDBCrudPolicy:
             TableName: !Ref LocationLogTable
-        - AWSLambdaBasicExecutionRole
+#        - AWSLambdaBasicExecutionRole
       Environment:
         Variables:
           LOCATION_LOG_TABLE: !Ref LocationLogTable
