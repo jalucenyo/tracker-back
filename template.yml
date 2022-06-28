@@ -1,58 +1,50 @@
-# This is the SAM template that represents the architecture of your serverless application
-# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
-
-# The AWSTemplateFormatVersion identifies the capabilities of the template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  Lambda-SQS starter application
-
-# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
 Transform: AWS::Serverless-2016-10-31
 
-# Shared configuration for all resources, more in
-# https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Description: >-
+  Tracker Backend
+
 Globals:
   Function:
-    # The PermissionsBoundary allows users to safely develop with their function's permissions constrained
-    # to their current application. All the functions and roles in this application have to include it and
-    # it has to be manually updated when you add resources to your application.
-    # More information in https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html
     PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${AppId}-${AWS::Region}-PermissionsBoundary'
 
 Parameters:
   AppId:
     Type: String
 
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: sqs-payload-logger.js
-  sqsPayloadLoggerFunction:
+  LocationPersist:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./
-      Handler: src/handlers/sqs-payload-logger.sqsPayloadLoggerHandler
+      Handler: src/handlers/location-persist.locationPersistHandler
       Runtime: nodejs14.x
-      Description: A Lambda function that logs the payload of messages sent to an associated SQS queue.
+      Description: Locations events in Queue persist in Database
       MemorySize: 128
-      Timeout: 25 # Chosen to be less than the default SQS Visibility Timeout of 30 seconds
+      Timeout: 300
       Policies:
-        # Give Lambda basic execution Permission to the sqsPayloadLogger
         - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          LOCATION_LOG_TABLE: !Ref LocationLogTable
       Events:
-        SimpleQueueEvent:
+        TrackerIn:
           Type: SQS
           Properties:
-            Queue: !GetAtt SimpleQueue.Arn
-  # This is an SQS queue with server-side encryption enabled, and default configuration properties
-  # otherwise. To learn more about the available options, see
-  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
-  SimpleQueue:
+            Queue: !GetAtt TrackerIn.Arn
+
+  TrackerIn:
     Type: AWS::SQS::Queue
     Properties:
       KmsMasterKeyId: alias/aws/sqs
+
+  LocationLogTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2

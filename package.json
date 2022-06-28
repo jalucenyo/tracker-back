@@ -3,12 +3,18 @@
     "description": "Lambda-SQS starter application",
     "version": "0.0.1",
     "private": true,
+    "type": "module",
     "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.113.0",
+        "@aws-sdk/util-dynamodb": "^3.113.0",
+        "nanoid": "^4.0.0",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "jest": "^25.4.0"
     },
     "scripts": {
+        "createTables": "aws dynamodb create-table --cli-input-json file://resources/tables/create-location-log.json --endpoint-url http://localhost:8000",
         "test": "jest"
     }
 }
