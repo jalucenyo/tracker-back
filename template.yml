@@ -23,12 +23,12 @@ Resources:
       Description: Locations events in Queue persist in Database
       MemorySize: 128
       Timeout: 300
-      Policies:
-        - SQSPollerPolicy:
-            QueueName:
-              !GetAtt TrackerIn.QueueName
-        - DynamoDBCrudPolicy:
-            TableName: !Ref LocationLogTable
+#      Policies:
+#        - SQSPollerPolicy:
+#            QueueName:
+#              !GetAtt TrackerIn.QueueName
+#        - DynamoDBCrudPolicy:
+#            TableName: !Ref LocationLogTable
       Environment:
         Variables:
           LOCATION_LOG_TABLE: !Ref LocationLogTable
@@ -40,8 +40,8 @@ Resources:
 
   TrackerIn:
     Type: AWS::SQS::Queue
-    Properties:
-      KmsMasterKeyId: alias/aws/sqs
+#    Properties:
+#      KmsMasterKeyId: alias/aws/sqs
 
   LocationLogTable:
     Type: AWS::Serverless::SimpleTable
