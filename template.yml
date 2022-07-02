@@ -12,6 +12,7 @@ Parameters:
 
 Resources:
 
+
   LocationPersist:
     Type: AWS::Serverless::Function
     Properties:
