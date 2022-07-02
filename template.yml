@@ -40,6 +40,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       KmsMasterKeyId: alias/aws/sqs
+      VisibilityTimeout: 2000
 
   LocationLogTable:
     Type: AWS::Serverless::SimpleTable
