@@ -2,9 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: Tracker Backend
 
-Globals:
-  Function:
-    PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${AppId}-${AWS::Region}-PermissionsBoundary'
+#Globals:
+#  Function:
+#    PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${AppId}-${AWS::Region}-PermissionsBoundary'
 
 Parameters:
   AppId:
@@ -21,12 +21,12 @@ Resources:
       Description: Locations events in Queue persist in Database
       MemorySize: 128
       Timeout: 300
-#      Policies:
-#        - SQSPollerPolicy:
-#            QueueName:
-#              !GetAtt TrackerIn.QueueName
-#        - DynamoDBCrudPolicy:
-#            TableName: !Ref LocationLogTable
+      Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              !GetAtt TrackerIn.QueueName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LocationLogTable
       Environment:
         Variables:
           LOCATION_LOG_TABLE: !Ref LocationLogTable
@@ -38,8 +38,8 @@ Resources:
 
   TrackerIn:
     Type: AWS::SQS::Queue
-#    Properties:
-#      KmsMasterKeyId: alias/aws/sqs
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
 
   LocationLogTable:
     Type: AWS::Serverless::SimpleTable
